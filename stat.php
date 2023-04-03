@@ -20,7 +20,7 @@ $results = [];
 
 foreach (explode("\n", $data) as $line) {
     $line = str_getcsv($line);
-    if (count($line) !== 26) {
+    if (count($line) !== 27) {
         continue;
     }
 
@@ -51,6 +51,7 @@ foreach (explode("\n", $data) as $line) {
         $payoutMethodType,
         $merchantId,
         $orderMemo,
+        $orderProcessedDate,
     ] = $line;
 
     if (!in_array($type, ['CREDIT', 'DEBIT'], true)) {
