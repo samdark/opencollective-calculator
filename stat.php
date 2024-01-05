@@ -6,7 +6,7 @@ if ($argc !== 3) {
     exit;
 }
 
-$url = 'https://rest.opencollective.com/v2/yiisoft/transactions.txt?kind=ADDED_FUNDS%2CCONTRIBUTION%2CEXPENSE&dateFrom=' . $argv[1] . 'T00%3A00%3A00.000Z&dateTo=' . $argv[2] . 'T23%3A59%3A59.999Z&includeGiftCardTransactions=1&includeIncognitoTransactions=1&includeChildrenTransactions=1&fetchAll=1';
+$url = 'https://rest.opencollective.com/v2/yiisoft/transactions.csv?fetchAll=1&includeGiftCardTransactions=1&includeIncognitoTransactions=1&includeChildrenTransactions=1&dateFrom=' . $argv[1] . 'T00%3A00%3A00.000Z&dateTo=' . $argv[2] . 'T23%3A59%3A59.999Z&flattenPaymentProcessorFee=1&fields=datetime%2CshortId%2CshortGroup%2Cdescription%2Ctype%2Ckind%2CisRefund%2CisRefunded%2CshortRefundId%2CdisplayAmount%2Camount%2CpaymentProcessorFee%2CnetAmount%2Cbalance%2Ccurrency%2CaccountSlug%2CaccountName%2CoppositeAccountSlug%2CoppositeAccountName%2CpaymentMethodService%2CpaymentMethodType%2CexpenseType%2CexpenseTags%2CpayoutMethodType%2CmerchantId%2CorderMemo';
 
 $data = file_get_contents($url);
 if ($data === false) {
@@ -20,7 +20,7 @@ $results = [];
 
 foreach (explode("\n", $data) as $line) {
     $line = str_getcsv($line);
-    if (count($line) !== 27) {
+    if (count($line) !== 26) {
         continue;
     }
 
@@ -51,8 +51,12 @@ foreach (explode("\n", $data) as $line) {
         $payoutMethodType,
         $merchantId,
         $orderMemo,
-        $orderProcessedDate,
     ] = $line;
+
+    // Skip Open Collective Fee
+    if ($kind === 'HOST_FEE') {
+        continue;
+    }
 
     if (!in_array($type, ['CREDIT', 'DEBIT'], true)) {
         continue;
