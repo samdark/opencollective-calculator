@@ -14,7 +14,8 @@ if ($data === false) {
 }
 
 $gitHubCredit = 0;
-$totalCreditWithoutGitHub = 0;
+$thanksDevCredit = 0;
+$openCollectiveCredit = 0;
 $totalDebit = 0;
 $results = [];
 
@@ -73,10 +74,15 @@ foreach (explode("\n", $data) as $line) {
     $results[$slot][$type] += $netAmount;
 
     if ($type === 'CREDIT') {
-        if ($oppositeAccountSlug === 'github-sponsors') {
-            $gitHubCredit += $netAmount;
-        } else {
-            $totalCreditWithoutGitHub += $netAmount;
+        switch ($oppositeAccountSlug) {
+            case 'github-sponsors':
+                $gitHubCredit += $netAmount;
+                break;
+            case 'thanks-dev':
+                $thanksDevCredit += $netAmount;
+                break;
+            default:
+                $openCollectiveCredit += $netAmount;
         }
     } else {
         $totalDebit += $netAmount;
@@ -103,11 +109,12 @@ foreach ($results as $name => $result) {
 echo "\n";
 
 echo 'GitHub Sponsors +' . $gitHubCredit . "$\n";
-echo 'OpenCollective +' . $totalCreditWithoutGitHub . "$\n";
+echo 'thanks.dev +' . $thanksDevCredit . "$\n";
+echo 'OpenCollective +' . $openCollectiveCredit . "$\n";
 
 echo "\n";
 
-echo 'Total Credit ' . ($totalCreditWithoutGitHub + $gitHubCredit) . "$\n";
+echo 'Total Credit ' . ($openCollectiveCredit + $gitHubCredit + $thanksDevCredit) . "$\n";
 echo 'Total Debit ' . $totalDebit . "$\n";
 
 echo "\n";
